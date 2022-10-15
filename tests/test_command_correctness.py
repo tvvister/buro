@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock
 from driver_core.driver import DriverIml
 from driver_core.virtual_device import VirtualDevice
 from rest_api.rest_api_server import RestAPIServer
+
 import pytest
 
 
@@ -14,7 +15,7 @@ def create_app(virtual_device):
 
 
 @pytest.mark.asyncio
-async def test_get_values_route(aiohttp_client):
+async def test_get_values_correctness(aiohttp_client):
     virtual_device = VirtualDevice()
     virtual_device.execute = AsyncMock(
         return_value=(datetime.now(), 'Success'))
@@ -27,15 +28,18 @@ async def test_get_values_route(aiohttp_client):
 
 
 @pytest.mark.asyncio
-async def test_start_channel_route(aiohttp_client):
+async def test_start_channel_correctness(aiohttp_client):
     virtual_device = VirtualDevice()
     virtual_device.execute = AsyncMock(return_value=None)
 
     client = await aiohttp_client(create_app(virtual_device))
     resp = await client.post("/start_channel/1/34.4/343.34")
     assert resp.status == 200
-    assert virtual_device.execute.called == True
-    assert len(virtual_device.execute.mock_calls) == 3
+
+    expected = [':SOURce1:CURRent 34.4',
+                ':SOURce1:VOLTage 343.34', ':OUTPut1:STATe ON']
+    for call, exp in zip(virtual_device.execute.await_args_list, expected):
+        assert call.args[0] == exp
 
 
 @pytest.mark.asyncio
@@ -46,5 +50,6 @@ async def test_disable_route(aiohttp_client):
     client = await aiohttp_client(create_app(virtual_device))
     resp = await client.post("/disable/1")
     assert resp.status == 200
-    assert virtual_device.execute.called == True
-    assert len(virtual_device.execute.mock_calls) == 1
+    expected = ':OUTPut1:STATe OFF'
+
+    assert virtual_device.execute.await_args_list[0].args[0] == expected

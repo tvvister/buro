@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from unittest.mock import AsyncMock
 
 from driver_core.driver import DriverIml
@@ -14,16 +15,16 @@ def create_app(virtual_device):
 
 
 @pytest.mark.asyncio
-async def test_get_values_route(aiohttp_client):
+async def test_get_values(aiohttp_client):
     virtual_device = VirtualDevice()
-    virtual_device.execute = AsyncMock(
-        return_value=(datetime.now(), 'Success'))
+    virtual_device.execute = AsyncMock(return_value=0.1,)
 
     client = await aiohttp_client(create_app(virtual_device))
-    resp = await client.get("/get_values/ALL")
+    resp = await client.get("/get_values/1")
     assert resp.status == 200
-    assert virtual_device.execute.called == True
-    assert len(virtual_device.execute.mock_calls) == 8
+    content = await resp.content.read()
+
+    assert content == ''
 
 
 @pytest.mark.asyncio
