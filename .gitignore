@@ -51,3 +51,6 @@ logs.txt
 
 # Sphinx documentation
 docs/_build/
+
+# VS code services files:
+.vscode/*

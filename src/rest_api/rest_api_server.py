@@ -63,7 +63,6 @@ class RestAPIServer:
         with ThreadPoolExecutor() as executor:
             executor.submit(start_log, self._driver)
     
-
             loop = asyncio.get_event_loop()
             handler = self.app.make_handler()
             f = loop.create_server(handler, '0.0.0.0', 5555)
