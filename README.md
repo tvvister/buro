@@ -10,6 +10,7 @@ Launch:
         curl -X POST http://0.0.0.0:5555/start_channel/1/100.1/220.1
         curl http://0.0.0.0:5555/get_values/1
         curl -X POST http://0.0.0.0:5555/disable/1
-
+Logs:
+    tail -f logs.txt
 Tests 
     pytest
