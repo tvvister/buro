@@ -1,8 +1,7 @@
 from datetime import datetime
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
-from driver_core.driver import DriverIml
-from driver_core.virtual_device import VirtualDevice
+from driver_core.driver import DeviceBase, DriverIml
 from rest_api.rest_api_server import RestAPIServer
 
 import pytest
@@ -16,7 +15,7 @@ def create_app(virtual_device):
 
 @pytest.mark.asyncio
 async def test_get_values_correctness(aiohttp_client):
-    virtual_device = VirtualDevice()
+    virtual_device = Mock(spec=DeviceBase)
     virtual_device.execute = AsyncMock(
         return_value=(datetime.now(), 'Success'))
 
@@ -29,7 +28,7 @@ async def test_get_values_correctness(aiohttp_client):
 
 @pytest.mark.asyncio
 async def test_start_channel_correctness(aiohttp_client):
-    virtual_device = VirtualDevice()
+    virtual_device = Mock(spec=DeviceBase)
     virtual_device.execute = AsyncMock(return_value=None)
 
     client = await aiohttp_client(create_app(virtual_device))
@@ -43,8 +42,8 @@ async def test_start_channel_correctness(aiohttp_client):
 
 
 @pytest.mark.asyncio
-async def test_disable_route(aiohttp_client):
-    virtual_device = VirtualDevice()
+async def test_disable_correctness(aiohttp_client):
+    virtual_device = Mock(spec=DeviceBase)
     virtual_device.execute = AsyncMock(return_value=None)
 
     client = await aiohttp_client(create_app(virtual_device))
